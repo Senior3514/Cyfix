@@ -1,0 +1,24 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fav-shield" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5eead4" />
+      <stop offset="1" stop-color="#0d9488" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0a0e12" />
+  <path
+    d="M32 10L50 16.6v14.6c0 13-8.6 23.6-18 28.2C22.6 54.8 14 44.2 14 31.2V16.6L32 10z"
+    fill="#0d1218"
+    stroke="url(#fav-shield)"
+    stroke-width="2.6"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M23.5 31.8l6 6 11-12.4"
+    stroke="url(#fav-shield)"
+    stroke-width="3.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+</svg>
