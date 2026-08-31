@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent } from "react";
 import { Loader2, Search, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
@@ -10,19 +10,21 @@ export function DomainForm() {
   const { domain, authorized, isScanning, setDomain, setAuthorized, beginScan, setResult, setError, error } =
     useScanStore();
   const log = useAuditStore((s) => s.log);
-  const [localDomain, setLocalDomain] = useState(domain);
+  // The domain lives in the shared store rather than local state: an agent's
+  // `prepare_scan` writes to the same field the human sees and edits, so both
+  // actors are always looking at exactly one agreed-upon target.
+  const target = domain.trim();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!authorized || !localDomain.trim() || isScanning) return;
+    if (!authorized || !target || isScanning) return;
 
-    setDomain(localDomain.trim());
     beginScan();
     log({
       actor: "human",
       tool: "scan_domain",
-      input: { domain: localDomain.trim() },
-      summary: `Started passive scan of ${localDomain.trim()}`,
+      input: { domain: target },
+      summary: `Started passive scan of ${target}`,
       ok: true,
     });
 
@@ -30,7 +32,7 @@ export function DomainForm() {
       const res = await fetch("/api/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domain: localDomain.trim(), authorized: true }),
+        body: JSON.stringify({ domain: target, authorized: true }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Scan failed");
@@ -38,14 +40,14 @@ export function DomainForm() {
       log({
         actor: "human",
         tool: "scan_domain",
-        input: { domain: localDomain.trim() },
+        input: { domain: target },
         summary: `Scan complete: score ${json.score}/100`,
         ok: true,
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Scan failed";
       setError(message);
-      log({ actor: "human", tool: "scan_domain", input: { domain: localDomain.trim() }, summary: message, ok: false });
+      log({ actor: "human", tool: "scan_domain", input: { domain: target }, summary: message, ok: false });
     }
   }
 
@@ -60,8 +62,8 @@ export function DomainForm() {
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-graphite-500" />
               <input
-                value={localDomain}
-                onChange={(e) => setLocalDomain(e.target.value)}
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
                 placeholder="example.com"
                 className="w-full rounded-lg border border-graphite-600 bg-graphite-900 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-graphite-600 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
               />
@@ -81,7 +83,7 @@ export function DomainForm() {
             </span>
           </label>
 
-          <Button type="submit" disabled={!authorized || !localDomain.trim() || isScanning} className="w-full">
+          <Button type="submit" disabled={!authorized || !target || isScanning} className="w-full">
             {isScanning ? (
               <>
                 <Loader2 size={16} className="animate-spin" /> Scanning…
