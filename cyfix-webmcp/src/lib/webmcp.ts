@@ -13,7 +13,8 @@ export interface ModelContextToolDef {
 }
 
 export interface ModelContext {
-  registerTool: (tool: ModelContextToolDef) => void;
+  /** Native implementations return a promise; the polyfill returns void. */
+  registerTool: (tool: ModelContextToolDef) => void | Promise<unknown>;
   unregisterTool?: (name: string) => void;
   tools?: ModelContextToolDef[];
 }
@@ -68,6 +69,23 @@ export function getRegisteredTools(): ModelContextToolDef[] {
   return document.modelContext?.tools ? [...document.modelContext.tools] : [...polyfillRegistry];
 }
 
+/**
+ * A tool result has two audiences. A native WebMCP agent consumes MCP-style
+ * content blocks (`content: [{ type: "text", ... }]`, `isError`); Cyfix's own
+ * Agent Console renders the structured payload. Return both shapes rather
+ * than forcing either side to guess at the other's format.
+ */
+function toolResponse(result: ToolResult) {
+  return {
+    content: [{ type: "text" as const, text: result.message }],
+    structuredContent: result.data,
+    isError: !result.ok,
+    ok: result.ok,
+    message: result.message,
+    data: result.data,
+  };
+}
+
 let registered = false;
 
 /**
@@ -82,7 +100,26 @@ export function registerCyfixTools() {
   const audit = () => useAuditStore.getState();
   const scan = () => useScanStore.getState();
 
-  ctx.registerTool({
+  // Wraps each tool so its ToolResult is delivered in the MCP-compatible
+  // envelope, and so a rejected native registerTool surfaces instead of
+  // becoming an unhandled promise.
+  const registerTool = (tool: {
+    name: string;
+    description: string;
+    inputSchema: Record<string, unknown>;
+    execute: (input: Record<string, unknown>) => Promise<ToolResult> | ToolResult;
+  }) => {
+    void Promise.resolve(
+      ctx.registerTool({
+        ...tool,
+        execute: async (input) => toolResponse(await tool.execute(input)),
+      }),
+    ).catch((err) => {
+      console.error(`[Cyfix] Could not register WebMCP tool "${tool.name}"`, err);
+    });
+  };
+
+  registerTool({
     name: "scan_domain",
     description:
       "Run a passive, authorized-only security scan of a domain (HTTPS, security headers, cookie flags, basic public exposure checks). Requires that a human has already checked the on-page authorization box for this domain — never scans without it.",
@@ -142,7 +179,7 @@ export function registerCyfixTools() {
     },
   });
 
-  ctx.registerTool({
+  registerTool({
     name: "explain_finding",
     description:
       "Explain, in plain language, why a specific finding from the current scan matters and what its real-world impact is.",
@@ -174,7 +211,7 @@ export function registerCyfixTools() {
     },
   });
 
-  ctx.registerTool({
+  registerTool({
     name: "generate_fix",
     description:
       "Generate a concrete, copy-pasteable remediation snippet (config or header) for a specific finding from the current scan.",
@@ -210,7 +247,7 @@ export function registerCyfixTools() {
     },
   });
 
-  ctx.registerTool({
+  registerTool({
     name: "export_report",
     description:
       "Export the current scan as a downloadable report. Format is 'json' or 'markdown'. Triggers a file download for the human and returns the report content for the agent.",
@@ -239,7 +276,7 @@ export function registerCyfixTools() {
     },
   });
 
-  ctx.registerTool({
+  registerTool({
     name: "prepare_scan",
     description:
       "Propose a domain for the human to authorize. Writes the domain into the Cyfix dashboard (navigating there if the human is on another page) and leaves the authorization checkbox deliberately unticked. Call this first whenever scan_domain reports that authorization is missing — Cyfix never lets an agent authorize a scan on the human's behalf.",
@@ -274,7 +311,7 @@ export function registerCyfixTools() {
     },
   });
 
-  ctx.registerTool({
+  registerTool({
     name: "list_findings",
     description:
       "List findings from the current scan as compact records (id, title, severity, category, passed), optionally filtered by severity or narrowed to only the checks that failed. Use this to decide which finding to explain or fix next instead of re-running a scan.",

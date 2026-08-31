@@ -27,7 +27,7 @@ function ToolCard({ tool }: { tool: ModelContextToolDef }) {
     setOutput(null);
     try {
       let input: Record<string, unknown> = {};
-      if (tool.name === "scan_domain") input = { domain };
+      if (tool.name === "scan_domain" || tool.name === "prepare_scan") input = { domain };
       if (tool.name === "explain_finding" || tool.name === "generate_fix") input = { findingId };
       if (tool.name === "export_report") input = { format };
 
@@ -58,7 +58,7 @@ function ToolCard({ tool }: { tool: ModelContextToolDef }) {
 
       {expanded && (
         <div className="space-y-3 border-t border-graphite-700 px-4 py-3.5">
-          {tool.name === "scan_domain" && (
+          {(tool.name === "scan_domain" || tool.name === "prepare_scan") && (
             <p className="text-xs text-graphite-500">
               Uses the domain currently entered above (<span className="text-graphite-300">{domain || "none set"}</span>
               ). Requires the authorization checkbox to be checked.
