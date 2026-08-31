@@ -10,6 +10,27 @@ html,
 body {
   background-color: #0a0e12;
   color: #e6ebf0;
+  /* A single wide child (a code block, a long header value) must never be able
+     to drag the whole page sideways on a phone. */
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Long, unbroken strings — header values, URLs, base64 — are the usual cause of
+   horizontal overflow. Let them wrap inside their own container instead. */
+pre,
+code {
+  overflow-wrap: anywhere;
+}
+
+/* Removes the grey flash on tap without removing focus styles. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep the sticky header and any bottom content clear of notches and home bars. */
+body {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 body {

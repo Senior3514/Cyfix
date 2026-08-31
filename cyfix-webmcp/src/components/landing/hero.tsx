@@ -57,7 +57,7 @@ export function Hero() {
               ].map((f) => (
                 <div
                   key={f.title}
-                  className="flex items-center justify-between rounded-lg border border-graphite-700 bg-graphite-850 px-3.5 py-3"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-graphite-700 bg-graphite-850 px-3.5 py-3"
                 >
                   <span className="text-sm text-graphite-300">{f.title}</span>
                   <SeverityBadge severity={f.severity} passed={f.passed} />

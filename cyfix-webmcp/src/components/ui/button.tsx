@@ -18,10 +18,12 @@ const variants: Record<Variant, string> = {
   danger: "bg-severity-critical/10 text-severity-critical border border-severity-critical/40 hover:bg-severity-critical/20",
 };
 
+// Minimum heights keep every control inside a comfortable touch target
+// rather than the ~28px a text-sized button would otherwise collapse to.
 const sizes: Record<Size, string> = {
-  sm: "text-xs px-3 py-1.5 gap-1.5",
-  md: "text-sm px-4 py-2.5 gap-2",
-  lg: "text-base px-6 py-3.5 gap-2.5",
+  sm: "text-xs px-3 py-1.5 gap-1.5 min-h-[36px]",
+  md: "text-sm px-4 py-2.5 gap-2 min-h-[44px]",
+  lg: "text-base px-6 py-3.5 gap-2.5 min-h-[52px]",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
