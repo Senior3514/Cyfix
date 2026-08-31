@@ -101,7 +101,7 @@ export function registerCyfixTools() {
         const result: ToolResult = {
           ok: false,
           message:
-            "Human authorization required. Ask the user to enter this exact domain and check 'I confirm I am authorized to test this domain' in the Cyfix dashboard before I can scan it.",
+            `Human authorization required for "${domain}". Call prepare_scan with this domain to put it in front of the human, then ask them to tick "I confirm I am authorized to test this domain" in the Cyfix dashboard. Cyfix will not scan a domain the human has not explicitly approved.`,
         };
         audit().log({ actor: "agent", tool: "scan_domain", input, summary: result.message, ok: false });
         return result;
@@ -236,6 +236,90 @@ export function registerCyfixTools() {
       const result: ToolResult = { ok: true, message: `Exported ${filename}`, data: content };
       audit().log({ actor: "agent", tool: "export_report", input, summary: result.message, ok: true });
       return result;
+    },
+  });
+
+  ctx.registerTool({
+    name: "prepare_scan",
+    description:
+      "Propose a domain for the human to authorize. Writes the domain into the Cyfix dashboard (navigating there if the human is on another page) and leaves the authorization checkbox deliberately unticked. Call this first whenever scan_domain reports that authorization is missing — Cyfix never lets an agent authorize a scan on the human's behalf.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        domain: { type: "string", description: "Bare domain to propose, e.g. example.com" },
+      },
+      required: ["domain"],
+    },
+    execute: (input) => {
+      const domain = String(input.domain ?? "").trim();
+      if (!domain) {
+        const result: ToolResult = { ok: false, message: "A domain is required." };
+        audit().log({ actor: "agent", tool: "prepare_scan", input, summary: result.message, ok: false });
+        return result;
+      }
+
+      // Writing the domain also revokes any authorization held for a previous
+      // target (see useScanStore.setDomain), so proposing a new domain can
+      // never inherit approval the human gave for a different one.
+      scan().setDomain(domain);
+
+      const onDashboard = window.location.pathname === "/app";
+      if (!onDashboard) {
+        window.location.href = `/app?domain=${encodeURIComponent(domain)}`;
+      }
+
+      const message = `Proposed "${domain}" in the Cyfix dashboard${onDashboard ? "" : " and opened it for the human"}. The human must now tick "I confirm I am authorized to test this domain" before scan_domain will run.`;
+      audit().log({ actor: "agent", tool: "prepare_scan", input, summary: message, ok: true });
+      return { ok: true, message, data: { domain, authorized: false } } satisfies ToolResult;
+    },
+  });
+
+  ctx.registerTool({
+    name: "list_findings",
+    description:
+      "List findings from the current scan as compact records (id, title, severity, category, passed), optionally filtered by severity or narrowed to only the checks that failed. Use this to decide which finding to explain or fix next instead of re-running a scan.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        severity: {
+          type: "string",
+          enum: ["critical", "high", "medium", "low", "info"],
+          description: "Only return findings at this severity",
+        },
+        onlyFailed: {
+          type: "boolean",
+          description: "Return only checks that did not pass. Defaults to true.",
+        },
+      },
+    },
+    execute: (input) => {
+      const result_ = scan().result;
+      if (!result_) {
+        const result: ToolResult = {
+          ok: false,
+          message: "No scan result yet. Run scan_domain first (after a human has authorized the domain).",
+        };
+        audit().log({ actor: "agent", tool: "list_findings", input, summary: result.message, ok: false });
+        return result;
+      }
+
+      const onlyFailed = input.onlyFailed === undefined ? true : input.onlyFailed === true;
+      const severity = typeof input.severity === "string" ? input.severity : undefined;
+
+      const matches = result_.findings
+        .filter((f) => (onlyFailed ? !f.passed : true))
+        .filter((f) => (severity ? f.severity === severity : true))
+        .map((f) => ({
+          id: f.id,
+          title: f.title,
+          severity: f.severity,
+          category: f.category,
+          passed: f.passed,
+        }));
+
+      const message = `${matches.length} finding(s) for ${result_.domain}${severity ? ` at severity ${severity}` : ""}${onlyFailed ? " that need attention" : ""}.`;
+      audit().log({ actor: "agent", tool: "list_findings", input, summary: message, ok: true });
+      return { ok: true, message, data: matches } satisfies ToolResult;
     },
   });
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { WebMcpProvider } from "@/components/webmcp-provider";
 
 export const metadata: Metadata = {
   title: "Cyfix — Fix web security with humans and agents together",
@@ -13,7 +14,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen font-sans antialiased">{children}</body>
+      <body className="min-h-screen font-sans antialiased">
+        <WebMcpProvider />
+        {children}
+      </body>
     </html>
   );
 }

@@ -7,7 +7,9 @@ safe **passive-only** scan, and both the human and an AI agent can explore findi
 plain-language explanations, generate remediations, and export a report — with the agent acting
 directly on the page through **WebMCP** (`document.modelContext.registerTool`).
 
-Built for the OpenAI WebMCP Challenge.
+Built for the [OpenAI WebMCP Challenge](https://webmcp.devpost.com/).
+
+**Live app: [cyfix.vercel.app](https://cyfix.vercel.app)** — [instant offline demo](https://cyfix.vercel.app/app?demo=1).
 
 ---
 
@@ -38,18 +40,24 @@ Built for the OpenAI WebMCP Challenge.
 
 ## WebMCP tools
 
-Cyfix registers four tools on `document.modelContext` (using
-[`registerTool`](https://github.com/webmachinelearning/webmcp)) as soon as the dashboard loads.
+Cyfix registers six tools on `document.modelContext` (using
+[`registerTool`](https://github.com/webmachinelearning/webmcp)) from every page — the landing page
+included — so an agent arriving at the site can discover them immediately.
 If the browser doesn't yet implement `document.modelContext` natively, `src/lib/webmcp.ts`
 installs a same-shape polyfill so the tools are always present and testable — visible live in the
 dashboard's **Agent Console**, where you can simulate any agent tool call by hand.
 
 | Tool | Description |
 | --- | --- |
+| `prepare_scan` | Proposes a domain to the human: writes it into the dashboard field, navigates there if the human is elsewhere, and deliberately leaves the authorization checkbox unticked. The agent's way to *ask*. |
 | `scan_domain` | Runs the passive scan for a domain. **Only executes if a human has already checked the authorization box for that exact domain** — this is enforced in the tool itself, not just the UI. |
+| `list_findings` | Returns compact finding records (id, title, severity, category, passed), filterable by severity or narrowed to failures only. |
 | `explain_finding` | Returns a plain-language explanation of a specific finding's real-world impact. |
 | `generate_fix` | Returns copy-pasteable remediation snippets (headers/config) for a finding. |
 | `export_report` | Builds a JSON or Markdown report of the current scan and triggers a download. |
+
+Authorization is tracked **per domain**: retargeting the scan to a different domain automatically
+revokes it, so approval for one host can never be reused against another.
 
 Every tool call — human or agent — is appended to the **Audit Log** with a timestamp, actor,
 input, and outcome.

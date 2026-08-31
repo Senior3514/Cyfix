@@ -27,6 +27,13 @@ function DashboardContent() {
   }, []);
 
   useEffect(() => {
+    // An agent that called prepare_scan from another page hands the proposed
+    // domain over via ?domain=, so the human lands on a prefilled — but still
+    // unauthorized — form and only has to approve.
+    const proposed = searchParams.get("domain");
+    if (proposed) {
+      useScanStore.getState().setDomain(proposed);
+    }
     if (searchParams.get("demo") === "1" && !useScanStore.getState().result) {
       loadDemo();
     }

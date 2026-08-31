@@ -4,6 +4,9 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { normalizeDomain } from "@/lib/utils";
 
 export const runtime = "nodejs";
+// A passive scan makes a handful of outbound requests; give it room on
+// serverless hosts whose default function timeout is a few seconds.
+export const maxDuration = 60;
 
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX ?? 5);
 

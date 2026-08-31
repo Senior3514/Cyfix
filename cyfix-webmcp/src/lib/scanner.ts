@@ -153,16 +153,20 @@ export async function runPassiveScan(domain: string): Promise<ScanResult> {
     findings.push(buildFinding("cookie-samesite", allSameSite, `${cookies.length} cookie(s) observed`));
   }
 
-  // 12. security.txt (informational)
-  const secTxt = await safeFetch(`https://${domain}/.well-known/security.txt`, { method: "GET" });
+  // 12-14. security.txt plus single, passive, well-known-path exposure checks
+  // (no brute force, no crawling). Issued in parallel so a slow target can't
+  // push the whole scan past a serverless function's time budget.
+  const [secTxt, envRes, gitRes] = await Promise.all([
+    safeFetch(`https://${domain}/.well-known/security.txt`, { method: "GET" }),
+    safeFetch(`https://${domain}/.env`, { method: "GET" }),
+    safeFetch(`https://${domain}/.git/config`, { method: "GET" }),
+  ]);
+
   findings.push(buildFinding("security-txt", secTxt.ok && secTxt.status === 200, secTxt.ok ? `HTTP ${secTxt.status}` : "unreachable"));
 
-  // 13-14. Single, passive, well-known-path exposure checks (no brute force, no crawling)
-  const envRes = await safeFetch(`https://${domain}/.env`, { method: "GET" });
   const envExposed = envRes.ok && envRes.status === 200 && !looksLikeHtmlShell(envRes.body);
   findings.push(buildFinding("env-file-exposure", !envExposed, envRes.ok ? `HTTP ${envRes.status}` : "unreachable"));
 
-  const gitRes = await safeFetch(`https://${domain}/.git/config`, { method: "GET" });
   const gitExposed = gitRes.ok && gitRes.status === 200 && !looksLikeHtmlShell(gitRes.body);
   findings.push(buildFinding("git-exposure", !gitExposed, gitRes.ok ? `HTTP ${gitRes.status}` : "unreachable"));
 

@@ -26,7 +26,15 @@ export const useScanStore = create<ScanState>((set, get) => ({
   isScanning: false,
   result: null,
   error: null,
-  setDomain: (domain) => set({ domain, error: null }),
+  setDomain: (domain) =>
+    set((state) => ({
+      domain,
+      error: null,
+      // Authorization is granted per domain. Retargeting always revokes it, so
+      // a human's approval for one domain can never be silently reused for
+      // another — including when an agent proposes a different target.
+      authorized: state.domain === domain ? state.authorized : false,
+    })),
   setAuthorized: (authorized) => set({ authorized }),
   beginScan: () => set({ isScanning: true, error: null }),
   setResult: (result) => set({ result, isScanning: false, error: null }),
