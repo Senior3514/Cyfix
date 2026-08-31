@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { WebMcpProvider } from "@/components/webmcp-provider";
 
@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Deliberately not capping maximumScale — pinch-zoom stays available.
+  themeColor: "#0a0e12",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

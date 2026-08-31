@@ -41,7 +41,12 @@ export const useScanStore = create<ScanState>((set, get) => ({
   setError: (error) => set({ error, isScanning: false }),
   loadDemo: () => {
     const result = buildDemoResult();
-    set({ result, domain: result.domain, authorized: true, isScanning: false, error: null });
+    // Deliberately does NOT prefill the form with the demo host. It is a
+    // fictional domain, so pre-authorizing it would leave the primary button
+    // armed to fail: one tap on "Run Passive Scan" and the first thing a new
+    // visitor sees is a connection error. The demo result is shown; the form
+    // stays empty and ready for a real target.
+    set({ result, domain: "", authorized: false, isScanning: false, error: null });
     return result;
   },
   reset: () => set({ result: null, error: null, isScanning: false }),

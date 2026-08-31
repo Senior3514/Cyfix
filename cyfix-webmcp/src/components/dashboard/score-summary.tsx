@@ -27,11 +27,19 @@ export function ScoreSummary({ result }: { result: ScanResult }) {
 
   return (
     <Card>
-      <CardBody className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs text-graphite-500">
-            {result.isDemo ? "Demo scan" : "Scan"} of <span className="text-white">{result.domain}</span>
-          </p>
+      <CardBody className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            {result.isDemo && (
+              <span className="rounded-full border border-teal-500/40 bg-teal-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-teal-300">
+                Demo data
+              </span>
+            )}
+            <p className="min-w-0 text-xs text-graphite-500">
+              {result.isDemo ? "Sample scan" : "Scan"} of{" "}
+              <span className="break-all text-white">{result.domain}</span>
+            </p>
+          </div>
           <p className="mt-1 text-xs text-graphite-600">Finished {formatDate(result.finishedAt)}</p>
           <div className="mt-3 flex flex-wrap gap-3">
             {failedBySeverity.map((s) => (
@@ -45,10 +53,16 @@ export function ScoreSummary({ result }: { result: ScanResult }) {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex shrink-0 items-center justify-between gap-4 border-t border-graphite-700 pt-4 sm:justify-end sm:border-0 sm:pt-0">
+          <p className="text-xs uppercase tracking-wide text-graphite-500 sm:hidden">Security score</p>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-wide text-graphite-500">Security score</p>
-            <p className={cn("text-4xl font-bold", scoreColor(result.score))}>{result.score}</p>
+            <p className="hidden text-xs uppercase tracking-wide text-graphite-500 sm:block">
+              Security score
+            </p>
+            <p className={cn("text-4xl font-bold leading-none", scoreColor(result.score))}>
+              {result.score}
+              <span className="ml-1 text-base font-medium text-graphite-600">/100</span>
+            </p>
           </div>
         </div>
       </CardBody>
