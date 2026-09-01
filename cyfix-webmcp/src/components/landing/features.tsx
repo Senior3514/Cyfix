@@ -45,7 +45,7 @@ export function Features() {
   return (
     <section id="features" className="mx-auto max-w-6xl px-6 py-24">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-3xl font-bold tracking-tight text-white">
+        <h2 className="font-display text-3xl font-bold tracking-tight text-white">
           Everything a human + agent team needs
         </h2>
         <p className="mt-4 text-graphite-500">
@@ -59,7 +59,7 @@ export function Features() {
               <div className="mb-4 inline-flex rounded-lg bg-teal-500/10 p-2.5 text-teal-400">
                 <Icon size={20} />
               </div>
-              <h3 className="text-sm font-semibold text-white">{title}</h3>
+              <h3 className="font-display text-sm font-semibold text-white">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-graphite-500">{body}</p>
             </CardBody>
           </Card>

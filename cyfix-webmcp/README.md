@@ -40,7 +40,7 @@ Built for the [OpenAI WebMCP Challenge](https://webmcp.devpost.com/).
 
 ## WebMCP tools
 
-Cyfix registers six tools on `document.modelContext` (using
+Cyfix registers seven tools on `document.modelContext` (using
 [`registerTool`](https://github.com/webmachinelearning/webmcp)) from every page — the landing page
 included — so an agent arriving at the site can discover them immediately.
 If the browser doesn't yet implement `document.modelContext` natively, `src/lib/webmcp.ts`
@@ -54,6 +54,7 @@ dashboard's **Agent Console**, where you can simulate any agent tool call by han
 | `list_findings` | Returns compact finding records (id, title, severity, category, passed), filterable by severity or narrowed to failures only. |
 | `explain_finding` | Returns a plain-language explanation of a specific finding's real-world impact. |
 | `generate_fix` | Returns copy-pasteable remediation snippets (headers/config) for a finding. |
+| `verify_fix` | Re-runs the scan and reports whether a specific finding is now resolved, so a remediation is confirmed against the live site rather than assumed. Human-gated like any scan. |
 | `export_report` | Builds a JSON or Markdown report of the current scan and triggers a download. |
 
 Authorization is tracked **per domain**: retargeting the scan to a different domain automatically

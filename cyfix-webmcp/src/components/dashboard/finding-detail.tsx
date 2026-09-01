@@ -4,6 +4,7 @@ import { Bot, Wrench } from "lucide-react";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { SeverityBadge } from "@/components/ui/badge";
 import { CopyButton } from "@/components/ui/copy-button";
+import { VerifyFixButton } from "@/components/dashboard/verify-fix-button";
 import { explainFinding } from "@/lib/findings";
 import type { Finding } from "@/types";
 
@@ -71,6 +72,10 @@ export function FindingDetail({ finding }: { finding: Finding | null }) {
                   </pre>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-4 border-t border-graphite-700 pt-4">
+              <VerifyFixButton findingId={finding.id} />
             </div>
           </div>
         )}

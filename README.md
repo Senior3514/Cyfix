@@ -31,10 +31,11 @@ before it will do anything.
 broken," and it will scan, triage, explain, and write the config — while you keep a visible,
 revocable veto over the one step that actually touches someone else's server.
 
-## The six WebMCP tools
+## The seven WebMCP tools
 
 Registered on `document.modelContext` from **every page** (landing page included), so an agent can
-discover them the moment it arrives. Where a browser doesn't implement `document.modelContext`
+discover them the moment it arrives. The dashboard's own buttons call the same tools — the human UI
+is built on the tool surface rather than beside it. Where a browser doesn't implement `document.modelContext`
 natively yet, Cyfix installs a same-shape polyfill so the tools always exist and stay testable
 from the on-page **Agent Console**.
 
@@ -45,6 +46,7 @@ from the on-page **Agent Console**.
 | `list_findings` | Returns compact findings (id, title, severity, category), filterable by severity or to failures only. |
 | `explain_finding` | Explains one finding's real-world impact in plain language. |
 | `generate_fix` | Returns a copy-pasteable remediation snippet (header or config) for a finding. |
+| `verify_fix` | Re-scans the live site and confirms a fix actually landed — instead of assuming it did. Human-gated, like any scan. |
 | `export_report` | Builds a JSON or Markdown report and triggers a download for the human. |
 
 Every call — human or agent — lands in the **Audit Log** with timestamp, actor, input, and outcome.
@@ -57,7 +59,13 @@ agent → scan_domain("acme.com")
 agent → prepare_scan("acme.com")        # fills the field, cannot tick the box
 human → ✅ "I confirm I am authorized to test this domain"
 agent → scan_domain("acme.com")         # now it runs
+agent → generate_fix("csp-header")      # the exact header to paste
+human → (applies it)
+agent → verify_fix("csp-header")        # re-scans: did it actually land?
 ```
+
+That last step closes the loop. An agent doesn't just suggest a fix and declare
+victory — it goes back and checks the live site.
 
 Authorization is granted **per domain**. Retargeting to a different domain automatically revokes
 it, so an approval for `acme.com` can never be reused to scan `example.com`.
@@ -76,7 +84,7 @@ Scan `cyfix.vercel.app` from the dashboard and check.
 1. Open **[cyfix.vercel.app](https://cyfix.vercel.app)** → **Open Dashboard**.
 2. Enter a domain you own (or `example.com`) and tick the authorization box.
 3. **Run Passive Scan** → real findings, scored by severity, in a couple of seconds.
-4. Scroll to **Agent Console** — the six live WebMCP tools, callable by hand exactly as an agent
+4. Scroll to **Agent Console** — the seven live WebMCP tools, callable by hand exactly as an agent
    would call them. Try `list_findings` → `generate_fix`.
 5. **Export Report** → JSON, Markdown, or print to PDF.
 

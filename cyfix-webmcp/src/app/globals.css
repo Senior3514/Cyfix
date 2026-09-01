@@ -64,6 +64,19 @@ body {
   background-size: 32px 32px;
 }
 
+/* Motion is decoration here — never the only carrier of meaning — so it can be
+   switched off wholesale for anyone who asks the OS for less of it. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* A visible focus ring for keyboard users, on every control, without bringing
    back the ring on mouse clicks. */
 :focus-visible {
