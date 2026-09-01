@@ -11,6 +11,7 @@ import { FindingsTable } from "@/components/dashboard/findings-table";
 import { FindingDetail } from "@/components/dashboard/finding-detail";
 import { AgentConsole } from "@/components/dashboard/agent-console";
 import { AuditLog } from "@/components/dashboard/audit-log";
+import { ScanHistory } from "@/components/dashboard/scan-history";
 import { ReportModal } from "@/components/dashboard/report-modal";
 import { ScoreSummary } from "@/components/dashboard/score-summary";
 import { useScanStore } from "@/lib/stores";
@@ -103,8 +104,9 @@ function DashboardContent() {
           reaches their findings without scrolling past the console.
         */}
         <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[380px_minmax(0,1fr)] lg:items-start">
-          <div className="order-1 min-w-0 lg:order-none lg:col-start-1 lg:row-start-1">
+          <div className="order-1 min-w-0 space-y-5 sm:space-y-6 lg:order-none lg:col-start-1 lg:row-start-1">
             <DomainForm />
+            <ScanHistory />
           </div>
 
           <div className="order-2 min-w-0 space-y-5 sm:space-y-6 lg:order-none lg:col-start-2 lg:row-span-2 lg:row-start-1">

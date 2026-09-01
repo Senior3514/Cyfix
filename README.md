@@ -81,12 +81,14 @@ Scan `cyfix.vercel.app` from the dashboard and check.
 
 ## Try it in 60 seconds
 
-1. Open **[cyfix.vercel.app](https://cyfix.vercel.app)** → **Open Dashboard**.
-2. Enter a domain you own (or `example.com`) and tick the authorization box.
-3. **Run Passive Scan** → real findings, scored by severity, in a couple of seconds.
+1. Open **[cyfix.vercel.app](https://cyfix.vercel.app)** — the scanner is on the landing page
+   itself, not behind a signup. Type a domain, tick the authorization box, scan.
+2. Your result carries into the dashboard when you follow **Open the full dashboard**.
+3. Findings are scored by severity, each with a plain-language impact and a copy-paste fix.
 4. Scroll to **Agent Console** — the seven live WebMCP tools, callable by hand exactly as an agent
    would call them. Try `list_findings` → `generate_fix`.
 5. **Export Report** → JSON, Markdown, or print to PDF.
+6. Scan the same domain twice and **Scan history** shows which way the score moved.
 
 No API keys, no signup, nothing to install. In a hurry?
 **[cyfix.vercel.app/app?demo=1](https://cyfix.vercel.app/app?demo=1)** loads a full scan offline.

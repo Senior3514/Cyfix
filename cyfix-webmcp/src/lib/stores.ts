@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import type { AuditActor, AuditEntry, ScanResult } from "@/types";
 import { buildDemoResult } from "@/lib/demo-data";
+import { recordScan } from "@/lib/history";
 import { uid } from "@/lib/utils";
 
 interface ScanState {
@@ -41,7 +42,10 @@ export const useScanStore = create<ScanState>((set, get) => ({
     })),
   setAuthorized: (authorized) => set({ authorized }),
   beginScan: () => set({ isScanning: true, error: null }),
-  setResult: (result) =>
+  setResult: (result) => {
+    // Persisted before the state update so the history panel and the dashboard
+    // never disagree about what the latest scan was.
+    recordScan(result);
     set((state) => ({
       result,
       previousResult:
@@ -50,7 +54,8 @@ export const useScanStore = create<ScanState>((set, get) => ({
           : null,
       isScanning: false,
       error: null,
-    })),
+    }));
+  },
   setError: (error) => set({ error, isScanning: false }),
   loadDemo: () => {
     const result = buildDemoResult();
