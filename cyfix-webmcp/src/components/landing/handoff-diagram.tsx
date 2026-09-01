@@ -87,7 +87,7 @@ function Node({
   sublabel: string;
 }) {
   return (
-    <div className="flex w-24 shrink-0 flex-col items-center gap-2 text-center sm:w-28">
+    <div className="flex w-[4.75rem] shrink-0 flex-col items-center gap-2 text-center sm:w-28">
       <div className="relative">
         {active && (
           <span className="absolute inset-0 rounded-2xl border border-teal-400/40 animate-pulse-ring" />
@@ -122,7 +122,7 @@ function Node({
 function Wire({ live, blocked }: { live: boolean; blocked?: boolean }) {
   return (
     <div className="relative flex min-w-0 flex-1 items-center justify-center px-1">
-      <svg viewBox="0 0 100 12" preserveAspectRatio="none" className="h-3 w-full" aria-hidden="true">
+      <svg viewBox="0 0 100 12" preserveAspectRatio="none" className="h-3 w-full min-w-[22px]" aria-hidden="true">
         <line
           x1="0"
           y1="6"
@@ -131,7 +131,7 @@ function Wire({ live, blocked }: { live: boolean; blocked?: boolean }) {
           stroke={live ? "#2dd4bf" : blocked ? "#f43f5e" : "#1c2733"}
           strokeWidth="2"
           strokeLinecap="round"
-          strokeDasharray="6 6"
+          strokeDasharray="5 5"
           className={cn("transition-[stroke] duration-500", live && "animate-dash-flow")}
         />
       </svg>
@@ -194,7 +194,7 @@ export function HandoffDiagram() {
 
             {/* The gate — the only node that changes colour, because it is the
                 only thing in the diagram that decides anything. */}
-            <div className="flex w-24 shrink-0 flex-col items-center gap-2 text-center sm:w-28">
+            <div className="flex w-[4.75rem] shrink-0 flex-col items-center gap-2 text-center sm:w-28">
               <div
                 className={cn(
                   "flex h-14 w-14 items-center justify-center rounded-2xl border transition-colors duration-500 sm:h-16 sm:w-16",
