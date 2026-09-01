@@ -53,7 +53,7 @@ export default function OpengraphImage() {
         </div>
 
         <div style={{ display: "flex", gap: 14, marginTop: 46 }}>
-          {["6 WebMCP tools", "document.modelContext", "MIT licensed"].map((t) => (
+          {["7 WebMCP tools", "document.modelContext", "MIT licensed"].map((t) => (
             <div
               key={t}
               style={{
