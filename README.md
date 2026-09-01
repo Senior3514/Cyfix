@@ -62,6 +62,15 @@ agent → scan_domain("acme.com")         # now it runs
 Authorization is granted **per domain**. Retargeting to a different domain automatically revokes
 it, so an approval for `acme.com` can never be reused to scan `example.com`.
 
+## Cyfix scores 100/100 on itself
+
+The obvious first thing to do with a security scanner is point it at the scanner. So we did, and
+fixed everything it found — a nonce-based CSP (no `unsafe-inline` for scripts), HSTS, `nosniff`,
+`X-Frame-Options: DENY`, a referrer policy, a permissions policy, no framework banner, and a real
+`/.well-known/security.txt`.
+
+Scan `cyfix.vercel.app` from the dashboard and check.
+
 ## Try it in 60 seconds
 
 1. Open **[cyfix.vercel.app](https://cyfix.vercel.app)** → **Open Dashboard**.

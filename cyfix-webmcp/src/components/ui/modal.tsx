@@ -23,9 +23,15 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+    <div
+      data-modal-overlay
+      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4"
+    >
+      <div data-modal-backdrop className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div
+        data-modal-panel
+        role="dialog"
+        aria-modal="true"
         className={cn(
           // Full-width sheet anchored to the bottom on a phone; a centred
           // dialog once there is room for one.
