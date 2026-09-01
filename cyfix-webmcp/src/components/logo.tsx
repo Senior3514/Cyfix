@@ -35,7 +35,7 @@ export function Logo({ size = 32, showWordmark = true, className }: LogoProps) {
         <circle cx="26.2" cy="15.8" r="1.4" fill="#2dd4bf" />
       </svg>
       {showWordmark && (
-        <span className="text-lg font-semibold tracking-tight text-white">
+        <span className="font-display text-lg font-semibold tracking-tight text-white">
           Cy<span className="text-teal-400">fix</span>
         </span>
       )}

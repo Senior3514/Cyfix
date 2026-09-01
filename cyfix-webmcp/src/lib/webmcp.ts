@@ -3,7 +3,7 @@
 import { useAuditStore, useScanStore } from "@/lib/stores";
 import { explainFinding, generateFix } from "@/lib/findings";
 import { buildJsonReport, buildMarkdownReport, downloadFile } from "@/lib/report";
-import type { ToolResult } from "@/types";
+import type { Finding, ToolResult } from "@/types";
 
 export interface ModelContextToolDef {
   name: string;
@@ -357,6 +357,130 @@ export function registerCyfixTools() {
       const message = `${matches.length} finding(s) for ${result_.domain}${severity ? ` at severity ${severity}` : ""}${onlyFailed ? " that need attention" : ""}.`;
       audit().log({ actor: "agent", tool: "list_findings", input, summary: message, ok: true });
       return { ok: true, message, data: matches } satisfies ToolResult;
+    },
+  });
+
+  registerTool({
+    name: "verify_fix",
+    description:
+      "Re-run the passive scan and report whether a specific finding is now resolved. Use this after a human has applied a remediation, to confirm the fix actually landed on the live site instead of assuming it did. Requires the same human authorization as any other scan.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        findingId: {
+          type: "string",
+          description:
+            "The finding to verify. Omit to re-scan and report every check that changed.",
+        },
+      },
+    },
+    execute: async (input) => {
+      const state = scan();
+      const before = state.result;
+
+      if (!before) {
+        const result: ToolResult = {
+          ok: false,
+          message: "Nothing to verify yet — run scan_domain first.",
+        };
+        audit().log({ actor: "agent", tool: "verify_fix", input, summary: result.message, ok: false });
+        return result;
+      }
+
+      const domain = before.domain;
+
+      // Verification is a fresh scan of a live host, so it goes through exactly
+      // the same human gate as the first one. A fix is not a licence to re-scan.
+      if (!state.authorized || state.domain !== domain) {
+        const result: ToolResult = {
+          ok: false,
+          message: `Verifying re-scans ${domain}, which needs the same human authorization as any scan. Call prepare_scan with "${domain}" and ask the human to approve it.`,
+        };
+        audit().log({ actor: "agent", tool: "verify_fix", input, summary: result.message, ok: false });
+        return result;
+      }
+
+      state.beginScan();
+      try {
+        const res = await fetch("/api/scan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ domain, authorized: true }),
+        });
+        const after = await res.json();
+        if (!res.ok) throw new Error(after.error ?? "Re-scan failed");
+        state.setResult(after);
+
+        const changed = (after.findings as Finding[])
+          .map((now) => {
+            const then = before.findings.find((f) => f.id === now.id);
+            if (!then || then.passed === now.passed) return null;
+            return { id: now.id, title: now.title, severity: now.severity, fixed: now.passed };
+          })
+          .filter(Boolean) as {
+          id: string;
+          title: string;
+          severity: string;
+          fixed: boolean;
+        }[];
+
+        const findingId = typeof input.findingId === "string" ? input.findingId : undefined;
+
+        if (findingId) {
+          const then = before.findings.find((f) => f.id === findingId);
+          const now = (after.findings as Finding[]).find((f) => f.id === findingId);
+          if (!then || !now) {
+            const result: ToolResult = {
+              ok: false,
+              message: `No finding with id "${findingId}" in this scan.`,
+            };
+            audit().log({ actor: "agent", tool: "verify_fix", input, summary: result.message, ok: false });
+            return result;
+          }
+
+          const message = now.passed
+            ? then.passed
+              ? `"${now.title}" still passes. Nothing regressed.`
+              : `Confirmed: "${now.title}" is now fixed on ${domain}. Score ${before.score} → ${after.score}.`
+            : `Not fixed yet — "${now.title}" still fails on ${domain}. Evidence: ${now.evidence ?? "none"}.`;
+
+          const result: ToolResult = {
+            ok: true,
+            message,
+            data: {
+              findingId,
+              wasPassing: then.passed,
+              nowPassing: now.passed,
+              fixed: !then.passed && now.passed,
+              evidence: now.evidence,
+              scoreBefore: before.score,
+              scoreAfter: after.score,
+            },
+          };
+          audit().log({ actor: "agent", tool: "verify_fix", input, summary: message, ok: true });
+          return result;
+        }
+
+        const fixedCount = changed.filter((c) => c.fixed).length;
+        const brokeCount = changed.length - fixedCount;
+        const message =
+          changed.length === 0
+            ? `Re-scanned ${domain}: nothing changed. Score still ${after.score}/100.`
+            : `Re-scanned ${domain}: ${fixedCount} check(s) now pass${brokeCount ? `, ${brokeCount} regressed` : ""}. Score ${before.score} → ${after.score}.`;
+
+        const result: ToolResult = {
+          ok: true,
+          message,
+          data: { domain, scoreBefore: before.score, scoreAfter: after.score, changed },
+        };
+        audit().log({ actor: "agent", tool: "verify_fix", input, summary: message, ok: true });
+        return result;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Re-scan failed";
+        state.setError(message);
+        audit().log({ actor: "agent", tool: "verify_fix", input, summary: message, ok: false });
+        return { ok: false, message } satisfies ToolResult;
+      }
     },
   });
 }

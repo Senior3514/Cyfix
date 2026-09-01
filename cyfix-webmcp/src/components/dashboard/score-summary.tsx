@@ -1,4 +1,5 @@
 import { Card, CardBody } from "@/components/ui/card";
+import { ScoreRing } from "@/components/dashboard/score-ring";
 import type { ScanResult, Severity } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -12,12 +13,6 @@ const SEVERITY_DOT: Record<Severity, string> = {
   low: "bg-severity-low",
   info: "bg-severity-info",
 };
-
-function scoreColor(score: number) {
-  if (score >= 80) return "text-teal-400";
-  if (score >= 50) return "text-severity-medium";
-  return "text-severity-critical";
-}
 
 export function ScoreSummary({ result }: { result: ScanResult }) {
   const failedBySeverity = SEVERITY_ORDER.map((sev) => ({
@@ -54,16 +49,10 @@ export function ScoreSummary({ result }: { result: ScanResult }) {
           </div>
         </div>
         <div className="flex shrink-0 items-center justify-between gap-4 border-t border-graphite-700 pt-4 sm:justify-end sm:border-0 sm:pt-0">
-          <p className="text-xs uppercase tracking-wide text-graphite-500 sm:hidden">Security score</p>
-          <div className="text-right">
-            <p className="hidden text-xs uppercase tracking-wide text-graphite-500 sm:block">
-              Security score
-            </p>
-            <p className={cn("text-4xl font-bold leading-none", scoreColor(result.score))}>
-              {result.score}
-              <span className="ml-1 text-base font-medium text-graphite-600">/100</span>
-            </p>
-          </div>
+          <p className="font-display text-xs font-semibold uppercase tracking-wide text-graphite-500">
+            Security score
+          </p>
+          <ScoreRing score={result.score} />
         </div>
       </CardBody>
     </Card>

@@ -6,17 +6,17 @@ import { SeverityBadge } from "@/components/ui/badge";
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-grid-pattern">
-      <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 py-24 lg:grid-cols-2 lg:py-32">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:gap-16 lg:py-32">
         <div>
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs font-medium text-teal-300">
             <Sparkles size={13} />
             Built for the OpenAI WebMCP Challenge
           </div>
-          <h1 className="text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
+          <h1 className="font-display text-[2.1rem] font-bold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
             Fix web security with <span className="text-teal-400">humans and agents</span>{" "}
             together
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-graphite-500">
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-graphite-400 sm:mt-6 sm:text-lg">
             Cyfix runs a safe, passive scan of an authorized domain, explains every finding in
             plain language, and exposes real tools an AI agent can call directly from the page —
             no exploits, no brute force, no port scanning. Just clear findings and fast fixes.

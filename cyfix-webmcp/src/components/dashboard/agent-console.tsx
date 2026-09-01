@@ -33,7 +33,8 @@ function ToolCard({ tool }: { tool: ModelContextToolDef }) {
     try {
       let input: Record<string, unknown> = {};
       if (tool.name === "scan_domain" || tool.name === "prepare_scan") input = { domain };
-      if (tool.name === "explain_finding" || tool.name === "generate_fix") input = { findingId };
+      if (tool.name === "explain_finding" || tool.name === "generate_fix" || tool.name === "verify_fix")
+        input = { findingId };
       if (tool.name === "export_report") input = { format };
       if (tool.name === "list_findings") input = severity ? { severity } : {};
 
@@ -46,7 +47,8 @@ function ToolCard({ tool }: { tool: ModelContextToolDef }) {
     }
   }
 
-  const needsFinding = tool.name === "explain_finding" || tool.name === "generate_fix";
+  const needsFinding =
+    tool.name === "explain_finding" || tool.name === "generate_fix" || tool.name === "verify_fix";
   const needsFormat = tool.name === "export_report";
   const needsDomain = tool.name === "scan_domain" || tool.name === "prepare_scan";
   const needsSeverity = tool.name === "list_findings";

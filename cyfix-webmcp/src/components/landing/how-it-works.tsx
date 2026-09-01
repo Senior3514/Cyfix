@@ -30,7 +30,7 @@ export function HowItWorks() {
   return (
     <section id="how-it-works" className="border-y border-graphite-800/80 bg-graphite-900/40">
       <div className="mx-auto max-w-4xl px-6 py-24">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-white">
+        <h2 className="font-display text-center text-3xl font-bold tracking-tight text-white">
           How it works
         </h2>
         <div className="mt-14 space-y-10">
@@ -38,7 +38,7 @@ export function HowItWorks() {
             <div key={s.n} className="flex gap-6">
               <div className="font-mono text-2xl font-bold text-teal-500/40">{s.n}</div>
               <div>
-                <h3 className="text-base font-semibold text-white">{s.title}</h3>
+                <h3 className="font-display text-base font-semibold text-white">{s.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-graphite-500">{s.body}</p>
               </div>
             </div>

@@ -10,6 +10,9 @@ interface ScanState {
   authorized: boolean;
   isScanning: boolean;
   result: ScanResult | null;
+  /** The scan this one replaced, when both cover the same domain. Lets
+   *  verify_fix say what actually changed rather than just restating state. */
+  previousResult: ScanResult | null;
   error: string | null;
   setDomain: (domain: string) => void;
   setAuthorized: (authorized: boolean) => void;
@@ -25,6 +28,7 @@ export const useScanStore = create<ScanState>((set, get) => ({
   authorized: false,
   isScanning: false,
   result: null,
+  previousResult: null,
   error: null,
   setDomain: (domain) =>
     set((state) => ({
@@ -37,7 +41,16 @@ export const useScanStore = create<ScanState>((set, get) => ({
     })),
   setAuthorized: (authorized) => set({ authorized }),
   beginScan: () => set({ isScanning: true, error: null }),
-  setResult: (result) => set({ result, isScanning: false, error: null }),
+  setResult: (result) =>
+    set((state) => ({
+      result,
+      previousResult:
+        state.result && state.result.domain === result.domain && !state.result.isDemo
+          ? state.result
+          : null,
+      isScanning: false,
+      error: null,
+    })),
   setError: (error) => set({ error, isScanning: false }),
   loadDemo: () => {
     const result = buildDemoResult();
@@ -46,10 +59,10 @@ export const useScanStore = create<ScanState>((set, get) => ({
     // armed to fail: one tap on "Run Passive Scan" and the first thing a new
     // visitor sees is a connection error. The demo result is shown; the form
     // stays empty and ready for a real target.
-    set({ result, domain: "", authorized: false, isScanning: false, error: null });
+    set({ result, previousResult: null, domain: "", authorized: false, isScanning: false, error: null });
     return result;
   },
-  reset: () => set({ result: null, error: null, isScanning: false }),
+  reset: () => set({ result: null, previousResult: null, error: null, isScanning: false }),
 }));
 
 interface AuditState {
