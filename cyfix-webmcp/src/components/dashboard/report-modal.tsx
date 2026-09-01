@@ -33,7 +33,7 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <Modal open={open} onClose={onClose} title="Export Report" className="max-w-3xl print:max-w-none">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div className="flex gap-2">
           <button
             onClick={() => setTab("markdown")}
@@ -61,7 +61,7 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
         {content}
       </pre>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <div className="mt-5 flex flex-col gap-3 print:hidden sm:flex-row sm:flex-wrap">
         <Button onClick={handleDownload} className="w-full sm:w-auto">
           {tab === "json" ? <FileJson size={16} /> : <FileText size={16} />} Download {tab}
         </Button>

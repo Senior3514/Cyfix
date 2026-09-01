@@ -64,9 +64,57 @@ body {
   background-size: 32px 32px;
 }
 
+/* A visible focus ring for keyboard users, on every control, without bringing
+   back the ring on mouse clicks. */
+:focus-visible {
+  outline: 2px solid #2dd4bf;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 @media print {
   body {
     background: white;
     color: black;
+    padding: 0;
+  }
+
+  /* "Print / Save as PDF" should produce the report, not a screenshot of the
+     app around it. Everything but the report sheet is dropped, and the sheet
+     is un-anchored so it can flow across pages. */
+  header,
+  main,
+  [data-modal-backdrop] {
+    display: none !important;
+  }
+
+  [data-modal-overlay] {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  [data-modal-panel] {
+    position: static !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+
+  [data-modal-panel] h2 {
+    color: black !important;
+  }
+
+  pre {
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    border: 0 !important;
+    background: white !important;
+    color: black !important;
+    font-size: 10pt !important;
   }
 }
