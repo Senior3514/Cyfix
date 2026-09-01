@@ -12,6 +12,7 @@ import { FindingDetail } from "@/components/dashboard/finding-detail";
 import { AgentConsole } from "@/components/dashboard/agent-console";
 import { AuditLog } from "@/components/dashboard/audit-log";
 import { ScanHistory } from "@/components/dashboard/scan-history";
+import { SectionNav } from "@/components/dashboard/section-nav";
 import { ReportModal } from "@/components/dashboard/report-modal";
 import { ScoreSummary } from "@/components/dashboard/score-summary";
 import { useScanStore } from "@/lib/stores";
@@ -91,8 +92,15 @@ function DashboardContent() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl space-y-5 px-4 py-6 sm:space-y-6 sm:px-6 sm:py-8">
-        {result && <ScoreSummary result={result} />}
+      <main className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionNav />
+
+        <div className="space-y-5 py-6 sm:space-y-6 sm:py-8">
+        {result && (
+          <div id="overview" className="scroll-mt-28">
+            <ScoreSummary result={result} selectedId={selectedId} onSelect={selectFinding} />
+          </div>
+        )}
 
         {/*
           minmax(0, 1fr) rather than 1fr: a grid track defaults to min-width
@@ -106,13 +114,17 @@ function DashboardContent() {
         <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[380px_minmax(0,1fr)] lg:items-start">
           <div className="order-1 min-w-0 space-y-5 sm:space-y-6 lg:order-none lg:col-start-1 lg:row-start-1">
             <DomainForm />
-            <ScanHistory />
+            <div id="scan-history" className="scroll-mt-28">
+              <ScanHistory />
+            </div>
           </div>
 
           <div className="order-2 min-w-0 space-y-5 sm:space-y-6 lg:order-none lg:col-start-2 lg:row-span-2 lg:row-start-1">
             {result ? (
               <>
-                <FindingsTable findings={result.findings} selectedId={selectedId} onSelect={selectFinding} />
+                <div id="findings" className="scroll-mt-28">
+                  <FindingsTable findings={result.findings} selectedId={selectedId} onSelect={selectFinding} />
+                </div>
                 <FindingDetail finding={selectedFinding} />
               </>
             ) : (
@@ -123,9 +135,14 @@ function DashboardContent() {
           </div>
 
           <div className="order-3 min-w-0 space-y-5 sm:space-y-6 lg:order-none lg:col-start-1 lg:row-start-2">
-            <AgentConsole />
-            <AuditLog />
+            <div id="agent-console" className="scroll-mt-28">
+              <AgentConsole />
+            </div>
+            <div id="audit-log" className="scroll-mt-28">
+              <AuditLog />
+            </div>
           </div>
+        </div>
         </div>
       </main>
 
