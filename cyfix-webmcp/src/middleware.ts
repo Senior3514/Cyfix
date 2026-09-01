@@ -29,6 +29,9 @@ export function middleware(request: NextRequest) {
     `base-uri 'self'`,
     `form-action 'self'`,
     `frame-ancestors 'none'`,
+    // The demo video is loaded only after a click, from YouTube's no-cookie
+    // host. Without this the iframe would be blocked and play would look broken.
+    `frame-src https://www.youtube-nocookie.com`,
     `upgrade-insecure-requests`,
   ].join("; ");
 
