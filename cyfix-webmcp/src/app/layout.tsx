@@ -31,7 +31,7 @@ import { WebMcpProvider } from "@/components/webmcp-provider";
 export const dynamic = "force-dynamic";
 
 const DESCRIPTION =
-  "Cyfix lets a human and an AI agent inspect and improve an authorized website together: a passive security scan, plain-language findings, remediations, and six WebMCP tools an agent can call directly from the page.";
+  "Cyfix lets a human and an AI agent inspect and improve an authorized website together: a passive security scan, plain-language findings, remediations, and seven WebMCP tools an agent can call directly from the page.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cyfix.vercel.app"),

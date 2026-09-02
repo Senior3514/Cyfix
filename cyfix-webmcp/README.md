@@ -16,6 +16,7 @@ Built for the [OpenAI WebMCP Challenge](https://webmcp.devpost.com/).
 ## Table of contents
 
 - [Core flow](#core-flow)
+- [The workspace](#the-workspace)
 - [WebMCP tools](#webmcp-tools)
 - [Security rules](#security-rules)
 - [Tech stack](#tech-stack)
@@ -37,6 +38,20 @@ Built for the [OpenAI WebMCP Challenge](https://webmcp.devpost.com/).
 4. **Let an agent take the wheel.** Any AI agent embedded in the browser can call Cyfix's WebMCP
    tools directly from the page — every call is authorization-gated and logged.
 5. **Export a report.** Download a clean JSON or Markdown report, or print it to PDF.
+
+## The workspace
+
+`/app` is laid out as an application, not a page: a persistent left rail carries the sections
+(Overview, New Scan, Findings, Fix & Verify, Agent Console, Scan History, Audit Log), tracks which
+one you are reading via an `IntersectionObserver`, and pins the current target and score at the
+bottom. The mark at the top of the rail returns to the landing page, and the rail collapses to an
+icon strip whose state survives a reload. Below `lg` the rail becomes a drawer and a horizontal
+pill nav takes over, so the same structure holds on a phone.
+
+The top bar carries a live **tool-status pill** — how many WebMCP tools are registered on
+`document.modelContext` right now, and whether that landed on the browser's native implementation
+or on Cyfix's polyfill. It answers the first question anyone evaluating the app has without a
+devtools detour.
 
 ## WebMCP tools
 
@@ -154,11 +169,13 @@ cyfix-webmcp/
       layout.tsx, globals.css
     components/
       landing/                # Hero, features, how-it-works, security rules, footer
-      dashboard/               # Domain form, findings table, finding detail, agent console,
-                                 audit log, report modal, score summary
+      dashboard/               # App shell (sidebar, tool-status pill, empty state), domain form,
+                                 findings table, finding detail, agent console, audit log,
+                                 report modal, score summary, section rail
       ui/                      # Button, Card, Badge, Modal
       logo.tsx
     lib/
+      sections.ts              # Dashboard section registry + active-section tracking
       scanner.ts               # Server-side passive scan engine
       findings.ts               # Finding catalog: severity, explanations, remediations
       webmcp.ts                 # document.modelContext registration + polyfill + tool logic
