@@ -198,16 +198,19 @@ No setup required beyond `npm install && npm run dev` — the demo path never to
 - [x] End-to-end product: landing page → authorized passive scan → findings → agent tools →
       report export
 - [x] WebMCP tools registered via `document.modelContext.registerTool` with a safe fallback
-      polyfill
-- [x] Four tools implemented: `scan_domain`, `explain_finding`, `generate_fix`, `export_report`
+      polyfill, from every page
+- [x] Seven tools implemented: `prepare_scan`, `scan_domain`, `list_findings`, `explain_finding`,
+      `generate_fix`, `verify_fix`, `export_report`
 - [x] Passive-only scanning with no exploits, brute force, or port scanning
-- [x] Human-authorization gate enforced both in the UI and inside the WebMCP tool logic
+- [x] Human-authorization gate enforced both in the UI and inside the WebMCP tool logic, tracked
+      per domain
 - [x] Full audit log of human + agent actions
 - [x] Demo mode requiring zero setup or network access
 - [x] Premium dark graphite/teal UI, custom SVG logo
 - [x] MIT license, README, `.env.example`, `deploy.sh`, PM2 config
-- [ ] Record a short demo video walking through the script above
-- [ ] Deploy a live instance and link it in the submission
+- [x] Deployed live at [cyfix.vercel.app](https://cyfix.vercel.app)
+- [ ] Record a short demo video walking through the script above (slot is wired up in
+      `src/components/landing/demo-video.tsx` — set `YOUTUBE_ID` once it's uploaded)
 
 ## License
 
